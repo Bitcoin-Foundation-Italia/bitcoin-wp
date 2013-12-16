@@ -124,6 +124,6 @@ def eurusd():
 
 if __name__ == '__main__':
     wp = WP(markets=['Bitstamp', 'Btce', 'MtGox'])
-    print wp.current_weightedprice()
+    print(wp.current_weightedprice())
 
 
