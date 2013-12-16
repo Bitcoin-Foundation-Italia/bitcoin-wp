@@ -21,99 +21,104 @@
 import requests
 import simplejson
 
-class MarketNotAvailable(Exception): pass
+
+class MarketNotAvailable(Exception):
+    pass
+
 
 class Market(object):
 
     """A Market object.
-    
+
     """
-    
+
     base_url = ''
     currency = ''
-    
-    def __init__(self, currency='USD'): self.currency = currency
-    
+
+    def __init__(self, currency='USD'):
+        self.currency = currency
+
     def ticker(self):
         res = self._ticker()
         return {'price': res['price'], 'volume': res['volume']}
-    
 
 
 class Bitstamp(Market):
     base_url = 'https://www.bitstamp.net/api/'
-    
+
     def _ticker(self):
         try:
             ticker_raw = requests.get(url="%sticker/" % self.base_url)
             ticker_json = simplejson.loads(ticker_raw.content)
-            price = (float(ticker_json['ask'])+float(ticker_json['bid']))/2
+            price = (float(ticker_json['ask']) + float(ticker_json['bid'])) / 2
             volume = float(ticker_json['volume'])
             return {'price': price, 'volume': volume}
-        except: #FIXME
+        except:  # FIXME
             raise MarketNotAvailable
-    
+
     def _eurusd(self):
         try:
             ticker_raw = requests.get(url="%seur_usd/" % self.base_url)
             ticker_json = simplejson.loads(ticker_raw.content)
-            eurusd = (float(ticker_json['sell'])+float(ticker_json['buy']))/2
+            eurusd = (
+                float(ticker_json['sell']) + float(ticker_json['buy'])) / 2
             return eurusd
-        except: #FIXME
+        except:  # FIXME
             raise MarketNotAvailable
-    
 
 
 class MtGox(Market):
     base_url = 'http://data.mtgox.com/api/1/'
-    
+
     def _ticker(self):
         try:
             ticker_raw = requests.get(url="%sBTCUSD/ticker" % self.base_url)
             ticker_json = simplejson.loads(ticker_raw.content)
-            price = (float(ticker_json['return']['buy']['value'])+float(ticker_json['return']['sell']['value']))/2
+            price = (float(ticker_json['return']['buy']['value']) + float(
+                ticker_json['return']['sell']['value'])) / 2
             volume = float(ticker_json['return']['vol']['value'])
             return {'price': price, 'volume': volume}
-        except: #FIXME
+        except:  # FIXME
             raise MarketNotAvailable
-    
 
 
 class Btce(Market):
     base_url = 'https://btc-e.com/api/2/'
-    
+
     def _ticker(self):
         try:
             ticker_raw = requests.get(url="%sbtc_usd/ticker" % self.base_url)
             ticker_json = simplejson.loads(ticker_raw.content)
-            price = (float(ticker_json['ticker']['sell'])+float(ticker_json['ticker']['buy']))/2.
+            price = (float(ticker_json['ticker']['sell']) + float(
+                ticker_json['ticker']['buy'])) / 2.
             volume = float(ticker_json['ticker']['vol_cur'])
             return {'price': price, 'volume': volume}
-        except: #FIXME
+        except:  # FIXME
             raise MarketNotAvailable
-    
-
 
 
 class WP(object):
     markets = ['MtGox', 'Bitstamp', 'Btce']
-    
+
     def __init__(self, currency='USD', markets=()):
         self.currency = currency
         # let's choose from which markets we take the data from
-        if markets: [self.markets.remove(m) for m in self.markets if m not in markets]
-    
+        if markets:
+            [self.markets.remove(m) for m in self.markets if m not in markets]
+
     def current_weightedprice(self):
         prices, markets = [], []
         for m in self.markets:
             try:
-                c = globals()[m](self.currency).ticker() #FIXME
+                c = globals()[m](self.currency).ticker()  # FIXME
                 prices.append((c['price'], c['volume']))
                 markets.append(m)
-            except MarketNotAvailable: pass
-        price = sum(p[0]*p[1] for p in prices)/sum(p[1] for p in prices) #FIXME
+            except MarketNotAvailable:
+                pass
+        price = sum(p[0] * p[1] for p in prices) / sum(p[1]
+                                                       for p in prices)  # FIXME
         return (markets, "%.2f" % price)
-            
+
 
 def eurusd():
     try:
@@ -125,5 +130,3 @@ def eurusd():
 if __name__ == '__main__':
     wp = WP(markets=['Bitstamp', 'Btce', 'MtGox'])
     print(wp.current_weightedprice())
-
-
