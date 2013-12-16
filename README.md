@@ -6,7 +6,7 @@ Copyright © 2013, Thomas Bertani
 
 License
 -------
-This software is released under the GNU LGPL license (see the included file
+This software is released under the GNU LGPL license (see the included files
 COPYING and COPYING.LESSER).
 
 Dependencies
