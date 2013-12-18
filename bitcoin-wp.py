@@ -67,6 +67,22 @@ class Bitstamp(Market):
             raise MarketNotAvailable
 
 
+class Eurofxref(Market):
+    r = requests.get('http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', stream=True)
+    from xml.etree import ElementTree as ET
+    tree = ET.parse(r.raw)
+    root = tree.getroot()
+    currency = "USD"
+
+    def _eurusd(self):
+        try:
+            match = self.root.find('.//ex:Cube[@currency="{}"]'.format(self.currency.upper()))
+            eurusd = (float((match.attrib['rate'])))
+            return eurusd
+        except:  # FIXME
+            raise MarketNotAvailable
+
+
 class MtGox(Market):
     base_url = 'http://data.mtgox.com/api/1/'
 
@@ -121,11 +137,14 @@ class WP(object):
 
 
 def eurusd():
-    try:
-        eurusd = Bitstamp()._eurusd()
-    except MarketNotAvailable:
-        eurusd = 1.33
-    return eurusd
+        try:
+            eurusd = Eurofxref()._eurusd()
+        except MarketNotAvailable:
+            try:
+                eurusd = Bitstamp()._eurusd()
+            except MarketNotAvailable:
+                eurusd = 1.33
+        return eurusd
 
 if __name__ == '__main__':
     wp = WP(markets=['Bitstamp', 'Btce', 'MtGox'])
