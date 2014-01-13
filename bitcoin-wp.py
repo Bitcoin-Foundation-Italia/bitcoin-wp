@@ -132,8 +132,8 @@ class WP(object):
             except MarketNotAvailable:
                 pass
         price = sum(p[0] * p[1] for p in prices) / sum(p[1]
-                                                       for p in prices)  # FIXME
-        return (markets, "%.2f" % price)
+                                                       for p in prices) / eurusd() # FIXME
+        return "%.2f" % price #return (markets, "%.2f" % price)
 
 
 def eurusd():
