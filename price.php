@@ -13,12 +13,23 @@ function price()
   }
   else
   {
-	$mystring = exec('/home/[USER]/pymodules/Python-3.3.3/python /home/[USER]/pymodules/Python-3.3.3/bitcoin-wp.py');
+	$mystring = exec('/home/[user]/pymodules/Python-3.3.3/python /home/[user]/pymodules/Python-3.3.3/bitcoin-wp.py');
 	file_put_contents($file,$mystring);
     return $mystring;
   }
 }
 
-echo price();
+$im = @imagecreate(460, 100) or die("Cannot Initialize new GD image stream");
+$message = price();
+header("Content-type: image/png");
+
+if ( $fromprice >99 )
+    $image = imagecreatefrompng("background-154x26.png");
+else
+    $image = imagecreatefrompng("background-134x26.png");
+$text_color = imagecolorallocate($image, 255, 0, 0);
+imagestring($image, 3, 5, 5, $message, $text_color);
+imagepng($image);
+imagedestroy($image);
 
 ?>
