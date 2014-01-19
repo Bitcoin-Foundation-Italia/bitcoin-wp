@@ -24,9 +24,9 @@ $message = price();
 header("Content-type: image/png");
 
 if ( $fromprice >99 )
-    $image = imagecreatefrompng("background-154x26.png");
-else
     $image = imagecreatefrompng("background-134x26.png");
+else
+    $image = imagecreatefrompng("background-130x26.png");
 $text_color = imagecolorallocate($image, 255, 0, 0);
 imagestring($image, 3, 5, 5, $message, $text_color);
 imagepng($image);
